@@ -9,4 +9,14 @@
     align-items: center;
     margin-bottom: 0.75rem;
   }
+
+  &__actions {
+    display: flex;
+    gap: 0.5rem;
+    align-items: center;
+
+    button mat-icon {
+      margin-right: 0.25rem;
+    }
+  }
 }

@@ -2,13 +2,14 @@ import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/cor
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
-import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { UserApiService } from '../../data-access/user-api.service';
 import { UserTableComponent } from '../../components/user-table/user-table.component';
 import { UserDialogComponent } from '../../components/user-dialog/user-dialog.component';
 import type { User, UserDraft } from '@pdr/shared';
+import { userRoles } from '@pdr/shared';
 import { of } from 'rxjs';
 import { map, switchMap, tap } from 'rxjs/operators';
+import { ToastService } from '../../../shared/toast/toast.service';
 
 @Component({
   selector: 'app-user-management',
@@ -17,7 +18,6 @@ import { map, switchMap, tap } from 'rxjs/operators';
     MatButtonModule,
     MatIconModule,
     MatDialogModule,
-    MatSnackBarModule,
     UserTableComponent,
   ],
   templateUrl: './user-management.component.html',
@@ -27,7 +27,7 @@ import { map, switchMap, tap } from 'rxjs/operators';
 export class UserManagementComponent {
   private readonly api = inject(UserApiService);
   private readonly dialog = inject(MatDialog);
-  private readonly snackbar = inject(MatSnackBar);
+  private readonly toast = inject(ToastService);
 
   readonly users = signal<User[]>([]);
   readonly loading = signal<boolean>(true);
@@ -43,7 +43,7 @@ export class UserManagementComponent {
       .pipe(tap(() => this.loading.set(false)))
       .subscribe({
         next: (data) => this.users.set(data),
-        error: () => this.snackbar.open('Failed to load users', 'Dismiss'),
+        error: () => this.toast.show('💥 Failed to load users', { variant: 'error' }),
       });
   }
 
@@ -52,6 +52,47 @@ export class UserManagementComponent {
       data: { userId: user.id },
       autoFocus: false,
       width: '480px',
+    });
+  }
+
+  async createRandomUser(): Promise<void> {
+    const { faker } = await import('@faker-js/faker');
+    const role = faker.helpers.arrayElement(userRoles);
+    const firstName = faker.person.firstName();
+    const lastName = faker.person.lastName();
+    const email = faker.internet.email({ firstName, lastName }).toLowerCase();
+    const birthDate = faker
+      .date
+      .birthdate({ min: 20, max: 60, mode: 'age' })
+      .toISOString()
+      .slice(0, 10);
+    const phoneMaybe = faker.helpers.maybe(() => faker.phone.number(), {
+      probability: role === 'viewer' ? 0.4 : 0.8,
+    });
+
+    const payload: UserDraft = {
+      firstName,
+      lastName,
+      email,
+      phoneNumber: phoneMaybe ?? undefined,
+      birthDate,
+      role,
+    };
+
+    this.loading.set(true);
+
+    this.api.create(payload).subscribe({
+      next: (created) => {
+        this.toast.show(
+          `🤖 Random user ${created.firstName} ${created.lastName} just spawned!`,
+          { variant: 'success', duration: 2800 }
+        );
+        this.refresh();
+      },
+      error: () => {
+        this.loading.set(false);
+        this.toast.show('💥 Unable to create random user', { variant: 'error' });
+      },
     });
   }
 
@@ -97,10 +138,10 @@ export class UserManagementComponent {
       .subscribe({
         next: (result) => {
           if (result === 'deleted') {
-            this.snackbar.open('User deleted', 'Close', { duration: 2000 });
+            this.toast.show('👋 User deleted. Farewell, friend!', { variant: 'warning', duration: 2600 });
           }
         },
-        error: () => this.snackbar.open('Unable to delete user', 'Dismiss'),
+        error: () => this.toast.show('💥 Unable to delete user', { variant: 'error' }),
       });
   }
 
@@ -134,9 +175,7 @@ export class UserManagementComponent {
           }
 
           if (!result.userId) {
-            this.snackbar.open('Unable to update user: missing identifier', 'Dismiss', {
-              duration: 3000,
-            });
+            this.toast.show('💥 Unable to update user: missing identifier', { variant: 'error' });
             return of(null);
           }
 
@@ -156,10 +195,14 @@ export class UserManagementComponent {
             return;
           }
 
-          const message = payload.action === 'created' ? 'User created' : 'User updated';
-          this.snackbar.open(message, 'Close', { duration: 2000 });
+          const message =
+            payload.action === 'created'
+              ? `🎉 ${payload.user.firstName} ${payload.user.lastName} joined the crew!`
+              : `🛠️ ${payload.user.firstName} ${payload.user.lastName}'s profile tuned up!`;
+          const variant = payload.action === 'created' ? 'success' : 'info';
+          this.toast.show(message, { variant, duration: 2600 });
         },
-        error: () => this.snackbar.open('Unable to save user', 'Dismiss'),
+        error: () => this.toast.show('💥 Unable to save user', { variant: 'error' }),
       });
   }
 
