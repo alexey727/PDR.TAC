@@ -45,6 +45,29 @@ export class UsersRepository {
     return record;
   }
 
+  async update(id: number, dto: UserDraft): Promise<User | undefined> {
+    await this.ensureLoaded();
+    if (!this.cache.has(id)) {
+      return undefined;
+    }
+
+    const record: User = baseUserSchema.parse({ ...dto, id });
+    this.cache.set(id, record);
+    await this.persist();
+    return record;
+  }
+
+  async delete(id: number): Promise<boolean> {
+    await this.ensureLoaded();
+    const removed = this.cache.delete(id);
+    if (!removed) {
+      return false;
+    }
+
+    await this.persist();
+    return true;
+  }
+
   private async ensureLoaded(): Promise<void> {
     if (this.loaded) {
       return;

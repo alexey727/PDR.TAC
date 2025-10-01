@@ -17,4 +17,12 @@ export class UsersService {
   create(dto: UserDraft): Promise<User> {
     return this.repository.create(dto);
   }
+
+  async update(id: number, dto: UserDraft): Promise<User | undefined> {
+    return this.repository.update(id, dto);
+  }
+
+  delete(id: number): Promise<boolean> {
+    return this.repository.delete(id);
+  }
 }

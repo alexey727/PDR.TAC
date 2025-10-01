@@ -20,4 +20,12 @@ export class UserApiService {
   create(payload: UserDraft): Observable<User> {
     return this.http.post<User>(API_BASE_URL, payload);
   }
+
+  update(id: number, payload: UserDraft): Observable<User> {
+    return this.http.put<User>(`${API_BASE_URL}/${id}`, payload);
+  }
+
+  delete(id: number): Observable<void> {
+    return this.http.delete<void>(`${API_BASE_URL}/${id}`);
+  }
 }

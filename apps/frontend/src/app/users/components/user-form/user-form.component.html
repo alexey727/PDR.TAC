@@ -1,4 +1,4 @@
-<h2 mat-dialog-title>Create user</h2>
+<h2 mat-dialog-title>{{ dialogTitle }}</h2>
 <mat-dialog-content [formGroup]="form" class="form-grid">
   <mat-form-field appearance="outline">
     <mat-label>First name</mat-label>
@@ -44,7 +44,7 @@
 
 <mat-dialog-actions align="end">
   <button mat-button (click)="cancel()">Cancel</button>
-  <button mat-flat-button color="primary" (click)="submit()">Create</button>
+  <button mat-flat-button color="primary" (click)="submit()">{{ actionLabel }}</button>
 </mat-dialog-actions>
 
 <div class="errors" *ngIf="validationError as err">

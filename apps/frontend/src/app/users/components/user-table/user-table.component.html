@@ -1,35 +1,81 @@
-<mat-form-field appearance="outline" class="search-field">
-  <mat-label>Search users</mat-label>
-  <input
-    matInput
-    [(ngModel)]="searchTerm"
-    (ngModelChange)="onSearchChange()"
-    placeholder="Search by name"
-  />
-</mat-form-field>
+<div class="table-controls">
+  <mat-form-field appearance="outline" class="search-field">
+    <mat-label>Search users</mat-label>
+    <input
+      matInput
+      [formControl]="searchControl"
+      placeholder="Search by name or email"
+    />
+  </mat-form-field>
+
+  <mat-form-field appearance="outline" class="role-filter">
+    <mat-label>Filter by role</mat-label>
+    <mat-select [formControl]="roleControl">
+      <mat-option
+        *ngFor="let option of roleOptions"
+        [value]="option"
+      >
+        {{ option === 'all' ? 'All roles' : (option | titlecase) }}
+      </mat-option>
+    </mat-select>
+  </mat-form-field>
+</div>
 
 <div class="table-wrapper" *ngIf="!loading; else loader">
-  <table mat-table [dataSource]="paginatedUsers" class="users-table">
+  <table
+    mat-table
+    [dataSource]="paginatedUsers"
+    class="users-table"
+    matSort
+    [matSortActive]="sortState.active"
+    [matSortDirection]="sortState.direction"
+    (matSortChange)="onSortChange($event)"
+  >
     <ng-container matColumnDef="id">
-      <th mat-header-cell *matHeaderCellDef>ID</th>
+      <th mat-header-cell *matHeaderCellDef mat-sort-header>ID</th>
       <td mat-cell *matCellDef="let user">{{ user.id }}</td>
     </ng-container>
 
     <ng-container matColumnDef="name">
-      <th mat-header-cell *matHeaderCellDef>Name</th>
+      <th mat-header-cell *matHeaderCellDef mat-sort-header>Name</th>
       <td mat-cell *matCellDef="let user">
         {{ user.firstName }} {{ user.lastName }}
       </td>
     </ng-container>
 
     <ng-container matColumnDef="email">
-      <th mat-header-cell *matHeaderCellDef>Email</th>
+      <th mat-header-cell *matHeaderCellDef mat-sort-header>Email</th>
       <td mat-cell *matCellDef="let user">{{ user.email }}</td>
     </ng-container>
 
     <ng-container matColumnDef="role">
-      <th mat-header-cell *matHeaderCellDef>Role</th>
-      <td mat-cell *matCellDef="let user">{{ user.role }}</td>
+      <th mat-header-cell *matHeaderCellDef mat-sort-header>Role</th>
+      <td mat-cell *matCellDef="let user">{{ user.role | titlecase }}</td>
+    </ng-container>
+
+    <ng-container matColumnDef="actions">
+      <th mat-header-cell *matHeaderCellDef class="actions-header"></th>
+      <td mat-cell *matCellDef="let user" class="actions-cell">
+        <div class="actions-buttons">
+          <button
+            mat-icon-button
+            type="button"
+            aria-label="Edit user"
+            (click)="onEdit(user, $event)"
+          >
+            <mat-icon>edit</mat-icon>
+          </button>
+          <button
+            mat-icon-button
+            type="button"
+            color="warn"
+            aria-label="Delete user"
+            (click)="onDelete(user, $event)"
+          >
+            <mat-icon>delete</mat-icon>
+          </button>
+        </div>
+      </td>
     </ng-container>
 
     <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>

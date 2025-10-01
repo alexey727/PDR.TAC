@@ -12,8 +12,18 @@ import { JsonPipe, NgFor, NgIf, TitleCasePipe } from '@angular/common';
 import { userRoles, createUserSchema, UserDraft } from '@pdr/shared';
 import type { ZodError } from 'zod';
 
+type FormMode = 'create' | 'edit';
+
 interface DialogPayload {
+  mode?: FormMode;
+  userId?: number;
   preset?: Partial<UserDraft>;
+}
+
+interface DialogResult {
+  mode: FormMode;
+  userId?: number;
+  data: UserDraft;
 }
 
 @Component({
@@ -40,9 +50,15 @@ interface DialogPayload {
 })
 export class UserFormComponent implements OnInit {
   private readonly fb = inject(FormBuilder);
-  private readonly dialogRef = inject(MatDialogRef<UserFormComponent, UserDraft | undefined>);
+  private readonly dialogRef = inject(
+    MatDialogRef<UserFormComponent, DialogResult | undefined>
+  );
 
-  constructor(@Inject(MAT_DIALOG_DATA) private readonly payload: DialogPayload | null) {}
+  readonly mode: FormMode;
+
+  constructor(@Inject(MAT_DIALOG_DATA) private readonly payload: DialogPayload | null) {
+    this.mode = this.payload?.mode ?? 'create';
+  }
 
   readonly roles = userRoles;
   validationError: ZodError | null = null;
@@ -92,10 +108,22 @@ export class UserFormComponent implements OnInit {
       return;
     }
 
-    this.dialogRef.close(result.data);
+    this.dialogRef.close({
+      mode: this.mode,
+      userId: this.payload?.userId,
+      data: result.data,
+    });
   }
 
   cancel(): void {
     this.dialogRef.close();
+  }
+
+  get dialogTitle(): string {
+    return this.mode === 'create' ? 'Create user' : 'Edit user';
+  }
+
+  get actionLabel(): string {
+    return this.mode === 'create' ? 'Create' : 'Save changes';
   }
 }

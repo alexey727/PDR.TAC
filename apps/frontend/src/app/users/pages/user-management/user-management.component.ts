@@ -8,7 +8,7 @@ import { UserTableComponent } from '../../components/user-table/user-table.compo
 import { UserDialogComponent } from '../../components/user-dialog/user-dialog.component';
 import type { User, UserDraft } from '@pdr/shared';
 import { of } from 'rxjs';
-import { switchMap, tap } from 'rxjs/operators';
+import { map, switchMap, tap } from 'rxjs/operators';
 
 @Component({
   selector: 'app-user-management',
@@ -56,6 +56,55 @@ export class UserManagementComponent {
   }
 
   async createUser(): Promise<void> {
+    await this.openUserForm('create');
+  }
+
+  async editUser(user: User): Promise<void> {
+    await this.openUserForm('edit', user);
+  }
+
+  async deleteUser(user: User): Promise<void> {
+    const { ConfirmDialogComponent } = await import(
+      '../../components/confirm-dialog/confirm-dialog.component'
+    );
+
+    const dialogRef = this.dialog.open(ConfirmDialogComponent, {
+      width: '360px',
+      data: {
+        title: 'Delete user',
+        message: `Are you sure you want to delete ${user.firstName} ${user.lastName}?`,
+        confirmLabel: 'Delete',
+        cancelLabel: 'Cancel',
+      },
+    });
+
+    dialogRef
+      .afterClosed()
+      .pipe(
+        switchMap((confirmed) => {
+          if (!confirmed) {
+            return of(null);
+          }
+
+          return this.api.delete(user.id).pipe(map(() => 'deleted' as const));
+        }),
+        tap((result) => {
+          if (result === 'deleted') {
+            this.refresh();
+          }
+        })
+      )
+      .subscribe({
+        next: (result) => {
+          if (result === 'deleted') {
+            this.snackbar.open('User deleted', 'Close', { duration: 2000 });
+          }
+        },
+        error: () => this.snackbar.open('Unable to delete user', 'Dismiss'),
+      });
+  }
+
+  private async openUserForm(mode: 'create' | 'edit', user?: User): Promise<void> {
     const { UserFormComponent } = await import(
       '../../components/user-form/user-form.component'
     );
@@ -63,25 +112,65 @@ export class UserManagementComponent {
     const dialogRef = this.dialog.open(UserFormComponent, {
       width: '520px',
       autoFocus: false,
+      data: {
+        mode,
+        userId: user?.id,
+        preset: user ? this.toDraft(user) : undefined,
+      },
     });
 
     dialogRef
       .afterClosed()
       .pipe(
-        switchMap((result) => (result ? this.api.create(result as UserDraft) : of(null))),
+        switchMap((result) => {
+          if (!result) {
+            return of(null);
+          }
+
+          if (result.mode === 'create') {
+            return this.api.create(result.data).pipe(
+              map((created) => ({ user: created, action: 'created' as const }))
+            );
+          }
+
+          if (!result.userId) {
+            this.snackbar.open('Unable to update user: missing identifier', 'Dismiss', {
+              duration: 3000,
+            });
+            return of(null);
+          }
+
+          return this.api.update(result.userId, result.data).pipe(
+            map((updated) => ({ user: updated, action: 'updated' as const }))
+          );
+        }),
         tap((payload) => {
-          if (payload) {
+          if (payload?.user) {
             this.refresh();
           }
         })
       )
       .subscribe({
         next: (payload) => {
-          if (payload) {
-            this.snackbar.open('User created', 'Close', { duration: 2000 });
+          if (!payload?.user) {
+            return;
           }
+
+          const message = payload.action === 'created' ? 'User created' : 'User updated';
+          this.snackbar.open(message, 'Close', { duration: 2000 });
         },
-        error: () => this.snackbar.open('Unable to create user', 'Dismiss'),
+        error: () => this.snackbar.open('Unable to save user', 'Dismiss'),
       });
+  }
+
+  private toDraft(user: User): UserDraft {
+    return {
+      firstName: user.firstName,
+      lastName: user.lastName,
+      email: user.email,
+      phoneNumber: user.phoneNumber ?? undefined,
+      birthDate: user.birthDate ?? undefined,
+      role: user.role,
+    };
   }
 }

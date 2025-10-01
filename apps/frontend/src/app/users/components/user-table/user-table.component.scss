@@ -1,6 +1,18 @@
-.search-field {
-  width: min(360px, 100%);
+.table-controls {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  align-items: flex-end;
   margin-bottom: 0.75rem;
+}
+
+.search-field {
+  flex: 1 1 260px;
+  min-width: 200px;
+}
+
+.role-filter {
+  flex: 0 0 180px;
 }
 
 .table-wrapper {
@@ -14,6 +26,22 @@
   width: 100%;
   cursor: pointer;
   border-collapse: collapse;
+}
+
+.actions-header {
+  width: 96px;
+  text-align: right;
+}
+
+.actions-cell {
+  text-align: right;
+}
+
+.actions-buttons {
+  display: inline-flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 0.25rem;
 }
 
 mat-paginator {
