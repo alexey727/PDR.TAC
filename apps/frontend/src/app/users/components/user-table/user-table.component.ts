@@ -22,6 +22,7 @@ import type { User, UserRole } from '@pdr/shared';
 import { userRoles } from '@pdr/shared';
 import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { UserAvatarComponent } from '../user-avatar/user-avatar.component';
 
 @Component({
   selector: 'app-user-table',
@@ -40,6 +41,7 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
     MatButtonModule,
     MatIconModule,
     TitleCasePipe,
+    UserAvatarComponent,
   ],
   templateUrl: './user-table.component.html',
   styleUrl: './user-table.component.scss',

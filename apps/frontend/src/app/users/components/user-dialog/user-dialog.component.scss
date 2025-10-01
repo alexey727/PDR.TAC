@@ -1,6 +1,35 @@
 .details {
+  display: grid;
+  gap: 1.25rem;
+
+  .summary {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    align-items: center;
+    text-align: center;
+
+    &__meta {
+      display: flex;
+      flex-direction: column;
+      gap: 0.2rem;
+    }
+
+    &__name {
+      font-size: 1.1rem;
+      font-weight: 600;
+    }
+
+    &__role {
+      font-size: 0.85rem;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      color: rgba(0, 0, 0, 0.54);
+    }
+  }
+
   dl {
-    margin-top: 5px;
+    margin: 0;
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
     gap: 1rem;

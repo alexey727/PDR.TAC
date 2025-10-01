@@ -1,6 +1,17 @@
 <ng-container *ngIf="user$ | async as user; else errorState">
   <h2 mat-dialog-title>{{ user.firstName }} {{ user.lastName }}</h2>
   <mat-dialog-content class="details">
+    <div class="summary">
+      <app-user-avatar
+        [name]="user.firstName + ' ' + user.lastName"
+        [email]="user.email"
+        [size]="96"
+      ></app-user-avatar>
+      <div class="summary__meta">
+        <span class="summary__name">{{ user.firstName }} {{ user.lastName }}</span>
+        <span class="summary__role">{{ user.role | titlecase }}</span>
+      </div>
+    </div>
     <dl>
       <div>
         <dt>Email</dt>
