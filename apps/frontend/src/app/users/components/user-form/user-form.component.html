@@ -17,7 +17,14 @@
 
   <mat-form-field appearance="outline">
     <mat-label>Phone number</mat-label>
-    <input matInput formControlName="phoneNumber" />
+    <input
+      matInput
+      type="tel"
+      inputmode="tel"
+      formControlName="phoneNumber"
+      (input)="onPhoneInput($event)"
+      placeholder="(123) 456-7890"
+    />
   </mat-form-field>
 
   <mat-form-field appearance="outline">

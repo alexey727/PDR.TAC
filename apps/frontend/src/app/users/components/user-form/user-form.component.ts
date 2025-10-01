@@ -88,6 +88,13 @@ export class UserFormComponent implements OnInit {
 
       this.form.patchValue(patch);
     }
+
+    const initialPhone = this.form.controls.phoneNumber.value;
+    if (initialPhone) {
+      this.form.controls.phoneNumber.setValue(this.formatPhone(initialPhone), {
+        emitEvent: false,
+      });
+    }
   }
 
   submit(): void {
@@ -125,5 +132,52 @@ export class UserFormComponent implements OnInit {
 
   get actionLabel(): string {
     return this.mode === 'create' ? 'Create' : 'Save changes';
+  }
+
+  onPhoneInput(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    const formatted = this.formatPhone(input.value);
+    input.value = formatted;
+    this.form.controls.phoneNumber.setValue(formatted, { emitEvent: false });
+  }
+
+  private formatPhone(value: string): string {
+    if (!value) {
+      return '';
+    }
+
+    const trimmed = value.trim();
+    const hasPlus = trimmed.startsWith('+');
+    const digits = trimmed.replace(/\D/g, '').slice(0, 15);
+
+    if (!digits) {
+      return hasPlus ? '+' : '';
+    }
+
+    const area = digits.slice(0, 3);
+    const prefix = digits.slice(3, 6);
+    const line = digits.slice(6, 10);
+    const extra = digits.slice(10);
+
+    let result = hasPlus ? '+' : '';
+
+    if (area) {
+      result += area.length === 3 ? `(${area})` : `(${area}`;
+    }
+
+    if (prefix) {
+      const spacer = area.length === 3 ? ' ' : '';
+      result += `${spacer}${prefix}`;
+    }
+
+    if (line) {
+      result += `-${line}`;
+    }
+
+    if (extra) {
+      result += ` ${extra}`;
+    }
+
+    return result.trim();
   }
 }
