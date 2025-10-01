@@ -4,6 +4,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { UserApiService } from '../../data-access/user-api.service';
 import { UserTableComponent } from '../../components/user-table/user-table.component';
+import type { InlineUpdatePayload } from '../../components/user-table/user-table.component';
 import { UserDialogComponent } from '../../components/user-dialog/user-dialog.component';
 import type { User, UserDraft } from '@pdr/shared';
 import { userRoles } from '@pdr/shared';
@@ -204,6 +205,41 @@ export class UserManagementComponent {
         },
         error: () => this.toast.show('💥 Unable to save user', { variant: 'error' }),
       });
+  }
+
+  handleInlineUpdate(update: InlineUpdatePayload): void {
+    const current = this.users().find((u) => u.id === update.id);
+
+    if (!current) {
+      this.toast.show('💥 Unable to update user inline (record missing)', {
+        variant: 'error',
+      });
+      return;
+    }
+
+    const draft: UserDraft = { ...this.toDraft(current), ...update.changes };
+
+    this.api.update(update.id, draft).subscribe({
+      next: (updated) => {
+        this.users.update((list) =>
+          list.map((u) => (u.id === updated.id ? updated : u))
+        );
+
+        if (update.changes.email) {
+          this.toast.show(
+            `📧 ${updated.firstName} ${updated.lastName}'s email updated`,
+            { variant: 'info', duration: 2400 }
+          );
+        } else if (update.changes.role) {
+          this.toast.show(
+            `🧭 ${updated.firstName} ${updated.lastName} is now ${updated.role.toUpperCase()}`,
+            { variant: 'success', duration: 2400 }
+          );
+        }
+      },
+      error: () =>
+        this.toast.show('💥 Unable to save inline changes', { variant: 'error' }),
+    });
   }
 
   private toDraft(user: User): UserDraft {

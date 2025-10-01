@@ -2,9 +2,11 @@ import {
   ChangeDetectionStrategy,
   Component,
   DestroyRef,
+  ElementRef,
   EventEmitter,
   Input,
   Output,
+  ViewChild,
   inject,
 } from '@angular/core';
 import { NgFor, NgIf, TitleCasePipe } from '@angular/common';
@@ -18,7 +20,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatSortModule, Sort } from '@angular/material/sort';
 import { ReactiveFormsModule, FormControl } from '@angular/forms';
-import type { User, UserRole } from '@pdr/shared';
+import type { User, UserDraft, UserRole } from '@pdr/shared';
 import { userRoles } from '@pdr/shared';
 import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
@@ -55,6 +57,7 @@ export class UserTableComponent {
   @Output() pageChange = new EventEmitter<PageEvent>();
   @Output() editUser = new EventEmitter<User>();
   @Output() deleteUser = new EventEmitter<User>();
+  @Output() inlineUpdate = new EventEmitter<InlineUpdatePayload>();
 
   displayedColumns = ['id', 'name', 'email', 'role', 'actions'];
   pageIndex = 0;
@@ -66,6 +69,13 @@ export class UserTableComponent {
   private searchTerm = '';
   private selectedRole: 'all' | UserRole = 'all';
   sortState: Sort = { active: 'id', direction: 'asc' };
+  editingEmailId: number | null = null;
+  editingRoleId: number | null = null;
+  readonly emailEditControl = new FormControl('', { nonNullable: true });
+  readonly roleEditControl = new FormControl<UserRole>('viewer', { nonNullable: true });
+
+  @ViewChild('emailInput') private emailInput?: ElementRef<HTMLInputElement>;
+  @ViewChild('roleSelect') private roleSelect?: ElementRef<HTMLSelectElement>;
 
   constructor() {
     this.searchControl.valueChanges
@@ -106,6 +116,74 @@ export class UserTableComponent {
   onDelete(user: User, event: MouseEvent): void {
     event.stopPropagation();
     this.deleteUser.emit(user);
+  }
+
+  startEmailEdit(user: User, event: MouseEvent): void {
+    event.stopPropagation();
+    if (this.editingEmailId === user.id) {
+      return;
+    }
+
+    this.editingEmailId = user.id;
+    this.emailEditControl.setValue(user.email, { emitEvent: false });
+
+    setTimeout(() => {
+      const ref = this.emailInput?.nativeElement;
+      if (ref) {
+        ref.focus();
+        ref.select();
+      }
+    });
+  }
+
+  commitEmail(user: User): void {
+    if (this.editingEmailId !== user.id) {
+      return;
+    }
+
+    const next = this.emailEditControl.value.trim();
+    this.editingEmailId = null;
+    if (!next || next === user.email) {
+      return;
+    }
+
+    this.inlineUpdate.emit({ id: user.id, changes: { email: next } });
+  }
+
+  cancelEmailEdit(): void {
+    this.editingEmailId = null;
+  }
+
+  startRoleEdit(user: User, event: MouseEvent): void {
+    event.stopPropagation();
+    if (this.editingRoleId === user.id) {
+      return;
+    }
+
+    this.editingRoleId = user.id;
+    this.roleEditControl.setValue(user.role, { emitEvent: false });
+    setTimeout(() => {
+      const element = this.roleSelect?.nativeElement;
+      element?.focus();
+    });
+  }
+
+  commitRole(user: User): void {
+    if (this.editingRoleId !== user.id) {
+      return;
+    }
+
+    const next = this.roleEditControl.value;
+    this.editingRoleId = null;
+    if (!next || next === user.role) {
+      return;
+    }
+
+    this.inlineUpdate.emit({ id: user.id, changes: { role: next } });
+  }
+
+  cancelRoleEdit(): void {
+    this.editingRoleId = null;
   }
 
   get filteredUsers(): User[] {
@@ -164,3 +242,8 @@ export class UserTableComponent {
     });
   }
 }
+
+export type InlineUpdatePayload = {
+  id: number;
+  changes: Partial<Pick<UserDraft, 'email' | 'role'>>;
+};

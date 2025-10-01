@@ -44,6 +44,51 @@
   font-weight: 600;
 }
 
+.email-cell,
+.role-cell {
+  display: flex;
+  align-items: center;
+  min-height: 48px;
+  width: 100%;
+}
+
+.email-text,
+.role-text {
+  display: inline-flex;
+  align-items: center;
+}
+
+.inline-input {
+  width: 100%;
+  padding: 0.2rem 0.45rem;
+  border-radius: 8px;
+  border: 1px solid rgba(15, 23, 42, 0.25);
+  font: inherit;
+  background: #fff;
+  box-sizing: border-box;
+}
+
+.inline-input:focus {
+  outline: none;
+  border-color: var(--mat-sys-primary, #1da4e8);
+  box-shadow: 0 0 0 2px rgba(29, 164, 232, 0.15);
+}
+
+.inline-select {
+  width: 100%;
+  padding: 0.2rem 0.35rem;
+  border-radius: 8px;
+  border: 1px solid rgba(15, 23, 42, 0.25);
+  font: inherit;
+  background: #fff;
+}
+
+.inline-select:focus {
+  outline: none;
+  border-color: var(--mat-sys-primary, #1da4e8);
+  box-shadow: 0 0 0 2px rgba(29, 164, 232, 0.15);
+}
+
 .actions-header {
   width: 96px;
   text-align: right;

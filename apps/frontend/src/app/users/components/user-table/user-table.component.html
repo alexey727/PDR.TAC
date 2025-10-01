@@ -54,12 +54,50 @@
 
     <ng-container matColumnDef="email">
       <th mat-header-cell *matHeaderCellDef mat-sort-header>Email</th>
-      <td mat-cell *matCellDef="let user">{{ user.email }}</td>
+      <td mat-cell *matCellDef="let user">
+        <div class="email-cell" (click)="startEmailEdit(user, $event)">
+          <ng-container *ngIf="editingEmailId === user.id; else viewEmail">
+            <input
+              #emailInput
+              class="inline-input"
+              [formControl]="emailEditControl"
+              (click)="$event.stopPropagation()"
+              (keydown.enter)="commitEmail(user); $event.preventDefault()"
+              (keydown.escape)="cancelEmailEdit()"
+              (blur)="commitEmail(user)"
+            />
+          </ng-container>
+          <ng-template #viewEmail>
+            <span class="email-text">{{ user.email }}</span>
+          </ng-template>
+        </div>
+      </td>
     </ng-container>
 
     <ng-container matColumnDef="role">
       <th mat-header-cell *matHeaderCellDef mat-sort-header>Role</th>
-      <td mat-cell *matCellDef="let user">{{ user.role | titlecase }}</td>
+      <td mat-cell *matCellDef="let user">
+        <div class="role-cell" (click)="startRoleEdit(user, $event)">
+          <ng-container *ngIf="editingRoleId === user.id; else viewRole">
+            <select
+              #roleSelect
+              class="inline-select"
+              [formControl]="roleEditControl"
+              (click)="$event.stopPropagation()"
+              (change)="commitRole(user)"
+              (blur)="commitRole(user)"
+              (keydown.escape)="cancelRoleEdit()"
+            >
+              <option *ngFor="let option of roleOptions" [value]="option">
+                {{ option | titlecase }}
+              </option>
+            </select>
+          </ng-container>
+          <ng-template #viewRole>
+            <span class="role-text">{{ user.role | titlecase }}</span>
+          </ng-template>
+        </div>
+      </td>
     </ng-container>
 
     <ng-container matColumnDef="actions">
