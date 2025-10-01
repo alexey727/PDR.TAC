@@ -28,6 +28,15 @@
   border-collapse: collapse;
 }
 
+.user-row {
+  transition: background-color 0.18s ease, transform 0.18s ease;
+}
+
+.user-row:hover {
+  background-color: rgba(29, 164, 232, 0.08);
+  transform: translateX(4px);
+}
+
 .name-cell {
   display: flex;
   align-items: center;

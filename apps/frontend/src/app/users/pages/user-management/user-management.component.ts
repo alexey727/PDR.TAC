@@ -29,7 +29,6 @@ export class UserManagementComponent {
   private readonly api = inject(UserApiService);
   private readonly dialog = inject(MatDialog);
   private readonly toast = inject(ToastService);
-
   readonly users = signal<User[]>([]);
   readonly loading = signal<boolean>(true);
 

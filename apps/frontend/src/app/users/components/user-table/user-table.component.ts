@@ -6,7 +6,8 @@ import {
   EventEmitter,
   Input,
   Output,
-  ViewChild,
+  QueryList,
+  ViewChildren,
   inject,
 } from '@angular/core';
 import { NgFor, NgIf, TitleCasePipe } from '@angular/common';
@@ -73,9 +74,8 @@ export class UserTableComponent {
   editingRoleId: number | null = null;
   readonly emailEditControl = new FormControl('', { nonNullable: true });
   readonly roleEditControl = new FormControl<UserRole>('viewer', { nonNullable: true });
-
-  @ViewChild('emailInput') private emailInput?: ElementRef<HTMLInputElement>;
-  @ViewChild('roleSelect') private roleSelect?: ElementRef<HTMLSelectElement>;
+  @ViewChildren('emailInput') private emailInputs?: QueryList<ElementRef<HTMLInputElement>>;
+  @ViewChildren('roleSelect') private roleSelects?: QueryList<ElementRef<HTMLSelectElement>>;
 
   constructor() {
     this.searchControl.valueChanges
@@ -128,7 +128,10 @@ export class UserTableComponent {
     this.emailEditControl.setValue(user.email, { emitEvent: false });
 
     setTimeout(() => {
-      const ref = this.emailInput?.nativeElement;
+      const ref = this.emailInputs
+        ?.toArray()
+        .find((el) => el.nativeElement.dataset['userId'] === String(user.id))
+        ?.nativeElement;
       if (ref) {
         ref.focus();
         ref.select();
@@ -163,7 +166,10 @@ export class UserTableComponent {
     this.editingRoleId = user.id;
     this.roleEditControl.setValue(user.role, { emitEvent: false });
     setTimeout(() => {
-      const element = this.roleSelect?.nativeElement;
+      const element = this.roleSelects
+        ?.toArray()
+        .find((el) => el.nativeElement.dataset['userId'] === String(user.id))
+        ?.nativeElement;
       element?.focus();
     });
   }
