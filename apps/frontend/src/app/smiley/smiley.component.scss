@@ -8,6 +8,11 @@
 }
 
 .smiley {
+  --mouth-rotate: 0deg;
+  --mouth-raise: 4%;
+  --mouth-width: 46%;
+  --mouth-height-scale: 1;
+  --mouth-color: #ff5a83;
   width: min(60vmin, 420px);
   aspect-ratio: 1 / 1;
   border-radius: 50%;
@@ -16,6 +21,17 @@
   background: radial-gradient(circle at 30% 30%, #fffcb5 0%, #f8e75b 60%, #e4dc46 100%);
   box-shadow: rgba(0, 0, 0, 0.12) 0 20px 40px;
   padding: 12%;
+  position: relative;
+  transition: box-shadow 0.4s ease, transform 0.4s ease;
+  outline: none;
+}
+
+.smiley:hover,
+.smiley:focus-visible {
+  transform: translateY(-4px);
+  box-shadow: rgba(0, 0, 0, 0.16) 0 30px 60px;
+  --mouth-width: 34%;
+  --mouth-height-scale: 3;
 }
 
 .eye-row {
@@ -30,6 +46,28 @@
   aspect-ratio: 1 / 1;
   border-radius: 50%;
   background: radial-gradient(circle at 40% 40%, #fff 0%, #1f1f1f 45%, #000 100%);
+  position: relative;
+  overflow: hidden;
+}
+
+.eye::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, #fdf7b0 0%, #f4dc53 70%, #e3cb44 100%);
+  transform: translateY(-110%);
+  border-radius: inherit;
+  transition: transform 0.25s ease;
+}
+
+.smiley:hover .eye:first-child::after,
+.smiley:focus-visible .eye:first-child::after {
+  animation: wink 0.35s ease forwards;
+}
+
+.eye:hover::after,
+.eye:focus-visible::after {
+  transform: translateY(0%);
 }
 
 .mouth-wrapper {
@@ -43,21 +81,50 @@
 }
 
 .mouth__inner {
-  width: 70%;
+  width: var(--mouth-width);
   aspect-ratio: 3 / 1;
-  border-radius: 50% / 100%;
-  background: #d32f55;
-  display: grid;
-  place-items: end center;
-  overflow: hidden;
+  border-radius: 999px;
+  background: var(--mouth-color);
+  box-shadow: inset 0 -4px 8px rgba(0, 0, 0, 0.2);
+  transform-origin: center;
+  transform:
+    translateY(var(--mouth-raise))
+    rotate(var(--mouth-rotate))
+    scaleY(var(--mouth-height-scale));
+  transition:
+    transform 0.35s ease,
+    width 0.35s ease,
+    background-color 0.35s ease,
+    box-shadow 0.35s ease,
+    border-radius 0.35s ease;
 }
 
-.mouth__inner::after {
-  content: '';
-  width: 90%;
-  aspect-ratio: 3 / 2;
+.smiley:hover .mouth__inner,
+.smiley:focus-visible .mouth__inner {
+  box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.16);
   border-radius: 50%;
-  background: #8c1f3a;
+}
+
+.mouth__inner:hover,
+.mouth__inner:focus-visible {
+  --mouth-height-scale: 0.2;
+  --mouth-width: 40%;
+  border-radius: 999px;
+  box-shadow: inset 0 3px 8px rgba(0, 0, 0, 0.24);
+}
+
+@keyframes wink {
+  0% {
+    transform: translateY(-110%);
+  }
+
+  50% {
+    transform: translateY(0%);
+  }
+
+  100% {
+    transform: translateY(-110%);
+  }
 }
 
 .caption {
@@ -83,6 +150,11 @@
   .caption__text--tablet {
     display: inline;
   }
+
+  .smiley {
+    --mouth-raise: 6%;
+    --mouth-width: 48%;
+  }
 }
 
 @media (min-width: 960px) {
@@ -92,6 +164,11 @@
 
   .caption__text--desktop {
     display: inline;
+  }
+
+  .smiley {
+    --mouth-raise: 4%;
+    --mouth-width: 44%;
   }
 }
 
@@ -103,6 +180,11 @@
   .caption__text--wide {
     display: inline;
   }
+
+  .smiley {
+    --mouth-raise: 2%;
+    --mouth-width: 40%;
+  }
 }
 
 @media (min-width: 1920px) {
@@ -112,5 +194,18 @@
 
   .caption__text--ultra {
     display: inline;
+  }
+
+  .smiley {
+    --mouth-raise: 0%;
+    --mouth-width: 36%;
+  }
+}
+
+@media (max-width: 599px) {
+  .smiley {
+    --mouth-raise: -6%;
+    --mouth-width: 50%;
+    --mouth-height-scale: 0.85;
   }
 }
