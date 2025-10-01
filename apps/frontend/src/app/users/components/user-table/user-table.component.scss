@@ -1,0 +1,27 @@
+.search-field {
+  width: min(360px, 100%);
+  margin-bottom: 0.75rem;
+}
+
+.table-wrapper {
+  background: var(--mat-table-container-color, #fff);
+  border-radius: 12px;
+  box-shadow: rgba(0, 0, 0, 0.08) 0 6px 20px;
+  padding: 0.75rem;
+}
+
+.users-table {
+  width: 100%;
+  cursor: pointer;
+  border-collapse: collapse;
+}
+
+mat-paginator {
+  margin-top: 0.5rem;
+}
+
+.loader {
+  display: flex;
+  justify-content: center;
+  padding: 2rem 0;
+}

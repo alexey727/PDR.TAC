@@ -1,0 +1,15 @@
+<section class="user-management">
+  <header class="user-management__header">
+    <h1>Users</h1>
+    <button mat-flat-button color="primary" (click)="createUser()">
+      <mat-icon>person_add</mat-icon>
+      Add user
+    </button>
+  </header>
+
+  <app-user-table
+    [users]="users()"
+    [loading]="loading()"
+    (viewDetails)="openDetails($event)"
+  ></app-user-table>
+</section>

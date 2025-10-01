@@ -1,0 +1,43 @@
+:host {
+  display: grid;
+  grid-template-rows: auto 1fr auto;
+  min-height: 100vh;
+}
+
+.app-header {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+
+.app-toolbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  min-height: 64px;
+}
+
+.app-title {
+  font-weight: 600;
+  letter-spacing: 0.05em;
+}
+
+.app-nav {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.active-link {
+  font-weight: 600;
+}
+
+.app-content {
+  padding: 1.5rem;
+}
+
+.app-footer {
+  text-align: center;
+  padding: 1rem;
+  color: rgba(0, 0, 0, 0.6);
+  background: rgba(0, 0, 0, 0.4);
+}

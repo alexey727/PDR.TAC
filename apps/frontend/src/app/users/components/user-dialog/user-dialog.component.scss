@@ -1,0 +1,23 @@
+.details {
+  dl {
+    margin-top: 5px;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+    gap: 1rem;
+
+    div {
+      background: rgba(0, 0, 0, 0.04);
+      border-radius: 12px;
+      padding: 0.75rem;
+    }
+
+    dt {
+      font-weight: 600;
+      opacity: 0.7;
+    }
+
+    dd {
+      margin: 0;
+    }
+  }
+}

@@ -1,0 +1,60 @@
+@use 'sass:map';
+@use '@angular/material' as mat;
+
+$primary-palette: map.merge(mat.$blue-palette, (
+  40: #1da4e8,
+  50: #4bbbf3,
+  60: #6fd1fd,
+  secondary: map.merge(mat.$cyan-palette, (
+    40: #20d2a8,
+    50: #44dfbb,
+    60: #68eccd,
+  )),
+  error: map.merge(mat.$red-palette, (
+    40: #d32f55,
+  )),
+ ));
+
+$tertiary-palette: map.merge(mat.$yellow-palette, (
+  40: #e4dc46,
+  50: #f0e86a,
+));
+
+$light-theme: mat.define-theme((
+  color: (
+    theme-type: light,
+    primary: $primary-palette,
+    tertiary: $tertiary-palette,
+  ),
+  density: (scale: 0),
+));
+
+@include mat.all-component-themes($light-theme);
+
+html,
+body,
+app-root {
+  min-width: 400px;
+  font-family: 'Inter', 'Helvetica Neue', Arial, sans-serif;
+  margin: 0;
+}
+
+.mat-mdc-form-field.mat-form-field-appearance-outline .mdc-notched-outline--notched .mdc-notched-outline__notch {
+  border-top: none;
+}
+
+.mat-mdc-form-field.mat-form-field-appearance-outline .mdc-floating-label--float-above {
+  background-color: var(
+    --mat-form-field-container-background-color,
+    var(--mat-app-background-color, #fff)
+  );
+  padding: 0 0.25rem;
+  z-index: 1;
+  pointer-events: none;
+}
+
+.mat-mdc-dialog-container .mat-mdc-dialog-surface {
+  box-shadow:
+    0 18px 40px rgba(15, 23, 42, 0.18),
+    0 8px 24px rgba(15, 23, 42, 0.14);
+}

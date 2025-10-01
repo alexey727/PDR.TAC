@@ -1,0 +1,35 @@
+<ng-container *ngIf="user$ | async as user; else errorState">
+  <h2 mat-dialog-title>{{ user.firstName }} {{ user.lastName }}</h2>
+  <mat-dialog-content class="details">
+    <dl>
+      <div>
+        <dt>Email</dt>
+        <dd>{{ user.email }}</dd>
+      </div>
+      <div>
+        <dt>Phone</dt>
+        <dd>{{ user.phoneNumber || '—' }}</dd>
+      </div>
+      <div>
+        <dt>Birth date</dt>
+        <dd>{{ user.birthDate || '—' }}</dd>
+      </div>
+      <div>
+        <dt>Role</dt>
+        <dd>{{ user.role }}</dd>
+      </div>
+    </dl>
+  </mat-dialog-content>
+  <mat-dialog-actions align="end">
+    <button mat-flat-button mat-dialog-close color="primary">Close</button>
+  </mat-dialog-actions>
+</ng-container>
+
+<ng-template #errorState>
+  <mat-dialog-content>
+    <p>Unable to load user details.</p>
+  </mat-dialog-content>
+  <mat-dialog-actions align="end">
+    <button mat-flat-button mat-dialog-close>Close</button>
+  </mat-dialog-actions>
+</ng-template>

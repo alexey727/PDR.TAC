@@ -1,0 +1,14 @@
+.form-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 1rem;
+  margin-top: 1rem;
+  padding-top: 0.5rem !important;
+}
+
+.errors {
+  padding: 1rem;
+  background-color: rgba(211, 47, 85, 0.08);
+  border-radius: 12px;
+  margin: 1rem;
+}
