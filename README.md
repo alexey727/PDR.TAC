@@ -27,6 +27,16 @@ Run the Angular frontend (proxies `/api` to the backend):
 npm run start:frontend
 ```
 
+The frontend dev server watches the shared library, so backend/frontend changes hot-reload automatically.
+
+## Features
+
+- **Inline editing:** Update a user's email or role directly inside the table; blur or press <kbd>Enter</kbd> to save, <kbd>Esc</kbd> to cancel.
+- **Random user generator:** The `Random user` button synthesises a valid user via `@faker-js/faker` and persists it immediately.
+- **Shared Zod validation:** Both apps leverage the same schemas from `libs/shared`, keeping validation rules in sync.
+- **Phone masking:** User form auto-formats telephone input while still accepting `+` country prefixes.
+- **Animated toasts:** A bespoke toast service displays stacked emoji notifications for create/update/delete flows.
+
 ## Workspace Layout
 
 - `apps/frontend` – Angular 18 Material UI with user management screens and `/smiley` route
